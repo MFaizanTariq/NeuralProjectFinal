@@ -4,13 +4,14 @@ from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score
 import random
+import matplotlib.pyplot as plt
 
-pso_inert = 0.4
-pso_c0 = 0.9
-pso_c1 = 0.9
+pso_inert = 0.89
+pso_c0 = 0.8
+pso_c1 = 0.99
 no_part = 70
 run_count = 25
-
+accuracies = []
 
 def fit_func(pos, data):
     X_train, X_test, y_train, y_test = data
@@ -66,15 +67,23 @@ def PSO(data):
 
         iteration = iteration + 1
 
-    gamma, c = np.mean(pos,axis=0)
-    X_train, X_test, y_train, y_test = data
+        gamma, c = np.mean(pos,axis=0)
+        X_train, X_test, y_train, y_test = data
 
-    svm_model = SVC(kernel='rbf', gamma=gamma, C=c)
-    svm_model.fit(X_train, y_train)
+        svm_model = SVC(kernel='rbf', gamma=gamma, C=c)
+        svm_model.fit(X_train, y_train)
 
-    y_pred = svm_model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    print("Accuracy:", accuracy)
+        y_pred = svm_model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        print("Iteration #:", iteration)
+        print("Accuracy:", accuracy)
+        accuracies.append(accuracy)
+
+    plt.plot(accuracies)
+    plt.xlabel('No. of Iteration')
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy vs Iteration')
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -82,8 +91,8 @@ if __name__ == '__main__':
     data2 = pd.read_csv(r'C:\Users\Tariq\PycharmProjects\NeuralProjectFinal\Datasets\diabetes1.csv')
     data3 = pd.read_csv(r'C:\Users\Tariq\PycharmProjects\NeuralProjectFinal\Datasets\heart_data.csv')
 
-    Y = data1['target']
-    X = data1.drop('target', axis=1)
+    Y = data2['target']
+    X = data2.drop('target', axis=1)
 
     X = (X - X.mean()) / X.std()
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=42)
